@@ -18,7 +18,6 @@ module.exports.register = async (req, res, next) => {
         return res.status(400).json({ message: 'User already exist' });
     }
 
-    // const hashedPass = await userModel.hashPassword(password);
     const hashedPass = await bcrypt.hash(password, 10);
     const user = await userService.createUser({firstname:fullname.firstname , lastname:fullname.lastname, password: hashedPass, email});
     const token = user.generateToken();
@@ -50,10 +49,11 @@ module.exports.getUserProfile = async (req, res, next) => {
 }
 
 module.exports.logoutUser = async (req, res, next) => {
-    res.clearCookie('token');
     const token = req.cookies.token || req.header('Authorization').split(' ')[1];
-
+    
     await blackListModel.create({ token });
     
-    res.status(200).json({ message: 'Logout successful' });
+    res.clearCookie('token');
+
+    res.status(200).json({ message: 'Logout successfully' });
 }
